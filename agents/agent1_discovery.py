@@ -97,33 +97,82 @@ def search_linkedin_public(query: str, location: str) -> list[dict]:
 
 
 def fetch_job_description(url: str) -> str:
-    """Fetch full job description from a job posting URL."""
+    """
+    Fetch full job description from a job posting URL.
+    Strategy:
+      1. Try fast httpx request (works for LinkedIn, Indeed, most sites)
+      2. If that yields < 200 chars (JS-rendered sites like Workday), fall back
+         to Playwright headless browser which executes JavaScript
+    """
     from bs4 import BeautifulSoup
+
+    def _extract_text(html: str) -> str:
+        soup = BeautifulSoup(html, "html.parser")
+        for selector in [
+            "div.description__text",
+            "div#jobDescriptionText",
+            "div[data-automation='jobDescription']",
+            "div[class*='job-description']",
+            "div[class*='jobDescription']",
+            "section.jobsearch-jobDescriptionText",
+            "div.show-more-less-html",
+            "[data-ui='job-description']",
+            "div.jobs-description",
+        ]:
+            el = soup.select_one(selector)
+            if el:
+                return el.get_text(separator="\n", strip=True)[:5000]
+        main = soup.find("main") or soup.find("article") or soup.find("body")
+        if main:
+            return main.get_text(separator="\n", strip=True)[:5000]
+        return ""
+
+    # Step 1: Fast HTTP request
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                      "Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
     }
     try:
         with httpx.Client(timeout=20, follow_redirects=True) as http:
             resp = http.get(url, headers=headers)
-            soup = BeautifulSoup(resp.text, "html.parser")
-            # Try common job description containers
-            for selector in [
-                "div.description__text",           # LinkedIn
-                "div#jobDescriptionText",          # Indeed
-                "div.job-description",
-                "div[class*='description']",
-                "section.jobsearch-jobDescriptionText",
-                "div.show-more-less-html",
-            ]:
-                el = soup.select_one(selector)
-                if el:
-                    return el.get_text(separator="\n", strip=True)[:4000]
-            # Fallback: grab main content
-            main = soup.find("main") or soup.find("article")
-            if main:
-                return main.get_text(separator="\n", strip=True)[:4000]
+            text = _extract_text(resp.text)
+            if len(text) > 200:
+                return text
     except Exception as e:
-        console.print(f"[dim]Could not fetch JD from {url}: {e}[/dim]")
+        console.print(f"[dim]HTTP fetch failed ({e}), trying browser...[/dim]")
+
+    # Step 2: Playwright fallback for JS-rendered pages (Workday, Greenhouse, etc.)
+    console.print(f"  [dim]Using browser to fetch JS-rendered page...[/dim]")
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_extra_http_headers({"Accept-Language": "en-US,en;q=0.9"})
+            page.goto(url, wait_until="networkidle", timeout=30000)
+            # Wait for job description content to appear
+            for selector in [
+                "[data-automation='jobDescription']",
+                "div[class*='jobDescription']",
+                "div[class*='description']",
+                "main",
+            ]:
+                try:
+                    page.wait_for_selector(selector, timeout=5000)
+                    break
+                except Exception:
+                    continue
+            html = page.content()
+            browser.close()
+            text = _extract_text(html)
+            if text:
+                return text
+    except ImportError:
+        console.print("[yellow]Playwright not installed. Run: playwright install chromium[/yellow]")
+    except Exception as e:
+        console.print(f"[dim]Browser fetch failed: {e}[/dim]")
+
     return ""
 
 
