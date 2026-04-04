@@ -1,6 +1,6 @@
 # JobApply — Automated Job Application Agent
 
-Automated job discovery, resume tailoring, and application for robotics/ADAS/AV engineers.
+Automated job discovery, resume tailoring, and application for Software engineers.
 
 ## Quick Start (5 minutes)
 
@@ -69,7 +69,7 @@ OWNER_NAME=Your Name                # Your name
 OWNER_EMAIL=you@email.com           # Your email
 LINKEDIN_URL=https://...            # Your LinkedIn
 TARGET_LOCATION=San Francisco Bay Area
-TARGET_ROLES=Robotics Software Engineer,Senior Software Engineer motion planning
+TARGET_ROLES= Software Engineer,Senior Software Engineer motion planning
 MIN_MATCH_SCORE=70                  # 0-100, only apply to jobs above this
 MAX_JOBS_PER_RUN=10
 HUMAN_REVIEW=true                   # Always review before submitting
@@ -79,7 +79,7 @@ JSEARCH_API_KEY=                    # Optional: better job search (rapidapi.com)
 
 ## Output
 
-- Tailored PDFs saved to `output/pdfs/shwetachauhan_nvidia_motionplanningengineer.pdf`
+- Tailored PDFs saved to `output/pdfs/name_companyname_rolename.pdf`
 - Application tracker at `output/applications.json`
 
 ## ATS Platform Support
