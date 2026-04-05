@@ -417,7 +417,8 @@ def run_application(
         elif actual_ats == "lever":
             fill_lever(page, record, profile)
         elif actual_ats == "workday":
-            fill_workday(page, record, profile)
+            from ats_adapters.workday import fill_workday_form
+            fill_workday_form(page, record, profile)
         else:
             fill_generic(page, record, profile)
 
