@@ -60,7 +60,6 @@ Match score: 84%
 You: apply to it
 Agent: Opening Workday application form...
 Form filled. Please review in the browser, then click Submit.
----
 
 ## CLI commands
 
