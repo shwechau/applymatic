@@ -63,7 +63,7 @@ Form filled. Please review in the browser, then click Submit.
 
 ## CLI commands
 
-```bash
+bash
 python main.py discover          # find matching jobs
 python main.py tailor            # tailor resumes for all scored jobs
 python main.py apply             # fill application forms
