@@ -31,7 +31,7 @@ python main_chat.py
 
 ---
 ## Chat interface
-
+```
 ╭──────────────────────────────────────╮
 │        applymatic chat agent         │
 │  Type what you want · Ctrl+C to quit │
