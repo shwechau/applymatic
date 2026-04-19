@@ -31,17 +31,24 @@ python main_chat.py
 
 ---
 ## Chat interface
+
 ╭──────────────────────────────────────╮
 │        applymatic chat agent         │
 │  Type what you want · Ctrl+C to quit │
 ╰──────────────────────────────────────╯
+
 You: find me robotics engineering jobs with 85%+ match
+
 Agent: Searching for robotics roles in the Bay Area...
+
 Found 7 jobs:
+
 [e6a4b9f] NVIDIA — Senior Systems Software Engineer (92%)
-[d27dc7b] Aurora — Behavior Planning Engineer (91%)
+[d27dc7b] Aurora — SDE (91%)
 [93919b3] Skild AI — Robotics Software Engineer (88%)
+
 You: tailor my resume for the NVIDIA job
+
 Agent: Analyzing keyword gaps...
 Current match: 71% → projected: 89% with 4 additions
 Suggested: "behavior trees", "Docker", "CI/CD", "CUDA"
